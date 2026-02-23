@@ -1,0 +1,38 @@
+select * from hr.employees;
+
+select count(*) employee_id  from hr.EMPLOYEES where salary>8000;
+
+SELECT COUNT(*) AS employee_count
+
+FROM hr.employees
+
+WHERE EXTRACT(YEAR FROM hire_date) < 2015;
+
+select count(*) employee_id FROM hr.EMPLOYEES where DEPARTMENT_ID=50;
+
+select count(*) COMMISSION_PCT  from hr.EMPLOYEES;
+
+select count(*) employee_id from hr.EMPLOYEES where MANAGER_ID is null;
+
+select count(*) first_name from hr.employees where first_name like 'j%';
+
+select count(*) last_name from hr.employees where last_name like 's%';
+
+select count(*) employee_id from hr.EMPLOYEES where salary between 4000 and 9000;
+
+SELECT COUNT(*) AS max_salary_employees
+FROM hr.employees
+WHERE salary = (SELECT MAX(salary) FROM hr.employees);
+
+SELECT COUNT(*) AS min_salary_employees
+FROM hr.employees
+WHERE salary = (SELECT Min(salary) FROM hr.employees);
+
+select * from hr.EMPLOYEES;
+
+select email from hr.EMPLOYEES where email like '%a%';
+
+select job_id from hr.EMPLOYEES where JOB_ID like 'id%';
+
+select email from hr.EMPLOYEES where email like 'a';
+
