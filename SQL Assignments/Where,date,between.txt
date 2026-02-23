@@ -1,0 +1,334 @@
+1.	select count(*) from hr.employees where salary>8000 and DEPARTMENT_ID=80;
+
+
+2.	select last_name from hr.EMPLOYEES where LAST_NAME like '%n';
+
+
+3.	select employee_id from hr.EMPLOYEES where HIRE_DATE> DATE '2005-01-01';
+
+4   select employee_id from hr.EMPLOYEES where JOB_ID in ('SA_REP','SA_MAN');
+5  select employee_id from hr.EMPLOYEES where salary between 4000 and 7000;
+select employee_id from hr.EMPLOYEES where MANAGER_ID is not null;
+
+select count(*) from hr.DEPARTMENTS where DEPARTMENT_ID in(10,20,30);
+
+select employee_id from hr.EMPLOYEES order by HIRE_DATE fetch first 3 rows only;
+
+select EMPLOYEE_ID from hr.EMPLOYEES where DEPARTMENT_ID=50 order by LAST_NAME;
+
+SELECT First_name from hr.EMPLOYEES where FIRST_NAME LIKE 'J%';
+
+select employee_id from hr.EMPLOYEES where salary not between 5000 and 10000;
+
+select employee_id from hr.EMPLOYEES where JOB_ID like '%CLERK%';
+
+select employee_id from hr.EMPLOYEES where COMMISSION_PCT>0.2;
+
+
+select employee_id from hr.EMPLOYEES order by HIRE_DATE  fetch first 10 rows only;
+
+select employee_id from hr.EMPLOYEES where DEPARTMENT_ID in (50,60)
+order by DEPARTMENT_ID,salary desc;
+
+select last_name from hr.EMPLOYEES where last_name like '_____';
+
+
+
+select employee_id from hr.EMPLOYEES where email like '%.com' or email like'%example%';
+
+
+select DISTINCT JOB_ID from hr.EMPLOYEES where DEPARTMENT_ID=50;
+
+select employee_id from hr.employees where DEPARTMENT_ID=80 and job_id='SA_MAN'
+and salary>7000;
+
+SELECT first_name
+FROM hr.employees
+WHERE hire_date > DATE '2000-01-01'
+  AND hire_date < DATE '2005-12-01';
+
+select last_name from hr.EMPLOYEES where LAST_NAME like 'k___';
+
+select first_name from hr.EMPLOYEES where first_name like '_a%';
+
+select employee_id from hr.employees WHERE (department_id = 60 AND job_id = 'IT_PROG') OR (department_id = 100 AND job_id LIKE 'FI%');
+
+
+select employee_id from hr.EMPLOYEES where EXTRACT(year from HIRE_DATE)=2003;
+
+select employee_id from hr.employees where COMMISSION_PCT is NULL and JOB_ID LIKE 'SA%';
+
+SELECT employee_id,
+       first_name,
+       last_name
+FROM hr.employees
+WHERE SUBSTR(last_name, 1, 1) NOT IN ('A', 'B', 'C');
+
+
+select employee_id from hr.employees WHERE SUBSTR(first_name,1,1) = SUBSTR(last_name,1,1);
+
+4-assignment
+
+select employee_id,first_name,length(last_name) 
+as "last name" from hr.employees;
+
+select employee_id from hr.employees where EXTRACT(year from HIRE_DATE)='2004';
+
+
+SELECT first_name,
+       last_name,
+       MONTHS_BETWEEN(SYSDATE, hire_date) AS tenure
+FROM hr.employees;
+
+
+select employee_id from hr.EMPLOYEES where salary between 4000 and 8000 and 
+DEPARTMENT_ID in (50,60) ;
+SELECT employee_id,
+       salary,
+       CASE
+           WHEN salary < 5000 THEN 'Tier1'
+           WHEN salary < 10000 THEN 'Tier2'
+           ELSE 'Tier3'
+       END AS salary_tier
+FROM hr.employees;
+
+
+select initcap(last_name) from hr.EMPLOYEES;
+
+
+select count(*) from hr.employees where department_id in
+(select DEPARTMENT_ID from hr.employees where department_id in (30,40,50));
+
+
+ALTER TABLE hr.employees
+ADD months NUMBER;
+
+
+SELECT COALESCE(phone_number, 'No_phone') AS phone_number_display
+FROM hr.employees;
+
+
+M11
+List employees with (department_id = 50 AND salary > 5000) OR (department_id = 60).
+SELECT employee_id, first_name, last_name, department_id, salary
+FROM hr.employees
+WHERE (department_id = 50 AND salary > 5000)
+   OR department_id = 60;
+________________________________________
+🔹 M12
+Display hire_date and hire_date + 12 months as one_year_later.
+SELECT hire_date,
+       ADD_MONTHS(hire_date, 12) AS one_year_later
+FROM hr.employees;
+________________________________________
+🔹 M13
+Show first_name, last_name, and initials.
+SELECT first_name,
+       last_name,
+       SUBSTR(first_name,1,1) || SUBSTR(last_name,1,1) AS initials
+FROM hr.employees;
+________________________________________
+🔹 M14
+List employees hired after 2006-01-01.
+SELECT employee_id, first_name, hire_date
+FROM hr.employees
+WHERE hire_date > DATE '2006-01-01';
+________________________________________
+🔹 M15
+Add column has_commission (‘Yes’ / ‘No’).
+SELECT employee_id,
+       commission_pct,
+       NVL2(commission_pct, 'Yes', 'No') AS has_commission
+FROM hr.employees;
+________________________________________
+🔹 M16
+Show salary and salary rounded to nearest hundred.
+SELECT salary,
+       ROUND(salary, -2) AS salary_rounded
+FROM hr.employees;
+________________________________________
+🔹 M17
+Employees with job_id SA_REP or SA_MAN and salary > 8000.
+SELECT employee_id, job_id, salary
+FROM hr.employees
+WHERE job_id IN ('SA_REP','SA_MAN')
+  AND salary > 8000;
+________________________________________
+🔹 M18
+Display hire_date and truncated hire_date.
+SELECT employee_id,
+       hire_date,
+       TRUNC(hire_date) AS hire_day
+FROM hr.employees;
+________________________________________
+🔹 M19
+Show last_name and lowercase last_name.
+SELECT last_name,
+       LOWER(last_name) AS last_lower
+FROM hr.employees;
+________________________________________
+🔹 M20
+Employees with tenure ≥ 10 years.
+SELECT employee_id, hire_date
+FROM hr.employees
+WHERE MONTHS_BETWEEN(SYSDATE, hire_date) / 12 >= 10;
+________________________________________
+🔥 HARD QUESTIONS (H1–H20)
+________________________________________
+🔸 H1
+Salary band using NTILE (top 25%, etc.).
+SELECT employee_id,
+       salary,
+       CASE NTILE(4) OVER (ORDER BY salary DESC)
+            WHEN 1 THEN 'A'
+            WHEN 2 THEN 'B'
+            WHEN 3 THEN 'C'
+            ELSE 'D'
+       END AS salary_band
+FROM hr.employees;
+________________________________________
+🔸 H2
+Employees hired in same year as their manager.
+SELECT e.employee_id, e.first_name, e.hire_date
+FROM hr.employees e
+JOIN hr.employees m
+ON e.manager_id = m.employee_id
+WHERE EXTRACT(YEAR FROM e.hire_date) =
+      EXTRACT(YEAR FROM m.hire_date);
+________________________________________
+🔸 H3
+Salary vs average salary.
+SELECT employee_id,
+       salary,
+       ROUND(salary - (SELECT AVG(salary) FROM hr.employees), 2)
+       AS salary_vs_avg
+FROM hr.employees;
+________________________________________
+🔸 H4
+Employees with exactly 5 letters in first_name.
+SELECT employee_id, first_name
+FROM hr.employees
+WHERE LENGTH(first_name) = 5;
+________________________________________
+🔸 H5
+Full name as “Last, First”.
+SELECT first_name,
+       last_name,
+       last_name || ', ' || first_name AS full_name
+FROM hr.employees;
+________________________________________
+🔸 H6
+Day of week employee was hired.
+SELECT employee_id,
+       hire_date,
+       TO_CHAR(hire_date, 'Day') AS day_of_week
+FROM hr.employees;
+________________________________________
+🔸 H7
+Employees whose department exists in hr.departments.
+SELECT employee_id, department_id
+FROM hr.employees
+WHERE department_id IN (
+    SELECT department_id FROM hr.departments
+);
+________________________________________
+🔸 H8
+Years remaining to complete 10 years tenure (<10 only).
+SELECT employee_id,
+       hire_date,
+       CASE
+           WHEN MONTHS_BETWEEN(SYSDATE, hire_date)/12 < 10
+           THEN ROUND(10 - MONTHS_BETWEEN(SYSDATE, hire_date)/12, 1)
+       END AS years_until_10
+FROM hr.employees;
+________________________________________
+🔸 H9
+Total compensation.
+SELECT employee_id,
+       salary,
+       commission_pct,
+       ROUND(salary * (1 + NVL(commission_pct,0)), 2) AS total_comp
+FROM hr.employees;
+________________________________________
+🔸 H10
+Employees hired on first day of month.
+SELECT employee_id, hire_date
+FROM hr.employees
+WHERE EXTRACT(DAY FROM hire_date) = 1;
+________________________________________
+🔸 H11
+Salary rank within department.
+SELECT employee_id,
+       department_id,
+       salary,
+       RANK() OVER (PARTITION BY department_id ORDER BY salary DESC)
+       AS sal_rank
+FROM hr.employees;
+________________________________________
+🔸 H12
+Employees whose last_name has at least two ‘a’.
+SELECT employee_id, last_name
+FROM hr.employees
+WHERE (LENGTH(LOWER(last_name))
+      - LENGTH(REPLACE(LOWER(last_name),'a',''))) >= 2;
+________________________________________
+🔸 H13
+Last day of hire month.
+SELECT hire_date,
+       LAST_DAY(hire_date) AS month_end
+FROM hr.employees;
+________________________________________
+🔸 H14
+Compensation category.
+SELECT employee_id,
+       commission_pct,
+       CASE
+           WHEN commission_pct IS NULL THEN 'Salary only'
+           ELSE 'Salary+Commission'
+       END AS comp_category
+FROM hr.employees;
+________________________________________
+🔸 H15
+Employees with tenure between 5 and 15 years.
+SELECT employee_id, hire_date
+FROM hr.employees
+WHERE MONTHS_BETWEEN(SYSDATE, hire_date)/12 BETWEEN 5 AND 15;
+________________________________________
+🔸 H16
+Reverse first_name (Oracle workaround).
+SELECT employee_id,
+       first_name,
+       REVERSE(first_name) AS first_name_reversed
+FROM hr.employees;
+________________________________________
+🔸 H17
+Employees with salary above average and valid department.
+SELECT employee_id, salary
+FROM hr.employees
+WHERE department_id IN (SELECT department_id FROM hr.departments)
+  AND salary > (SELECT AVG(salary) FROM hr.employees);
+________________________________________
+🔸 H18
+Salary with 15% bonus.
+SELECT employee_id,
+       salary,
+       salary * 1.15 AS salary_with_bonus
+FROM hr.employees;
+________________________________________
+🔸 H19
+Hire decade classification.
+SELECT employee_id,
+       hire_date,
+       CASE
+           WHEN EXTRACT(YEAR FROM hire_date) BETWEEN 2000 AND 2009 THEN '2000s'
+           WHEN EXTRACT(YEAR FROM hire_date) BETWEEN 1990 AND 1999 THEN '1990s'
+           ELSE 'Other'
+       END AS hire_decade
+FROM hr.employees;
+________________________________________
+🔸 H20
+First_name starts with A or B and salary > 6000.
+SELECT employee_id, first_name, salary
+FROM hr.employees
+WHERE (first_name LIKE 'A%' OR first_name LIKE 'B%')
+  AND salary > 6000;
