@@ -1,0 +1,177 @@
+M1. Employees whose salary > department average
+------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.salary, e.department_id
+FROM hr.employees e
+WHERE e.salary >
+      (SELECT AVG(salary)
+       FROM hr.employees
+       WHERE department_id = e.department_id);
+
+M2. Departments with at least one employee
+----------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE EXISTS
+      (SELECT 1
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id);
+
+M3. Departments with no employees
+---------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE NOT EXISTS
+      (SELECT 1
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id);
+
+M4. Employees who earn more than their manager
+---------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.salary, e.manager_id
+FROM hr.employees e
+WHERE e.salary >
+      (SELECT m.salary
+       FROM hr.employees m
+       WHERE m.employee_id = e.manager_id);
+
+M5. Departments with zero employees (COUNT = 0)
+-------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE (SELECT COUNT(*)
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id) = 0;
+
+M6. Employees hired after their manager
+---------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.hire_date, e.manager_id
+FROM hr.employees e
+WHERE e.hire_date >
+      (SELECT m.hire_date
+       FROM hr.employees m
+       WHERE m.employee_id = e.manager_id);
+
+M7. Departments with average salary between 5000 and 10000
+------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE (SELECT AVG(salary)
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id)
+      BETWEEN 5000 AND 10000;
+
+M8. Employees in departments with more than 5 employees
+------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.department_id
+FROM hr.employees e
+WHERE (SELECT COUNT(*)
+       FROM hr.employees e2
+       WHERE e2.department_id = e.department_id) > 5;
+
+M9. Departments with at least one employee earning > 10000
+----------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE EXISTS
+      (SELECT 1
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id
+         AND e.salary > 10000);
+
+M10. Employees who earn the minimum salary in their department
+-----------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.salary, e.department_id
+FROM hr.employees e
+WHERE e.salary =
+      (SELECT MIN(salary)
+       FROM hr.employees e2
+       WHERE e2.department_id = e.department_id);
+
+M11. Departments where max salary < 15000
+-----------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE (SELECT MAX(salary)
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id) < 15000;
+
+M12. Employees whose manager does not exist
+------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.manager_id
+FROM hr.employees e
+WHERE e.manager_id IS NOT NULL
+  AND NOT EXISTS
+      (SELECT 1
+       FROM hr.employees m
+       WHERE m.employee_id = e.manager_id);
+
+M13. Employees with the same job as their manager
+----------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.job_id, e.manager_id
+FROM hr.employees e
+WHERE e.job_id =
+      (SELECT m.job_id
+       FROM hr.employees m
+       WHERE m.employee_id = e.manager_id);
+       
+M14. Departments with at least one employee earning commission
+---------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE (SELECT COUNT(*)
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id
+         AND e.commission_pct IS NOT NULL) > 0;
+
+M15. Employees earning at least 80% of department max salary
+------------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.salary, e.department_id
+FROM hr.employees e
+WHERE e.salary >=
+      (SELECT MAX(salary)
+       FROM hr.employees e2
+       WHERE e2.department_id = e.department_id) * 0.8;
+
+M16. Departments with no employee hired before 2000
+--------------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE NOT EXISTS
+      (SELECT 1
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id
+         AND e.hire_date < DATE '2000-01-01');
+
+M17. Employees working in the Sales department
+---------------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.department_id
+FROM hr.employees e
+WHERE (SELECT d.department_name
+       FROM hr.departments d
+       WHERE d.department_id = e.department_id) = 'Sales';
+       
+M18. Departments where total salary > 100000
+-----------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE (SELECT SUM(salary)
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id) > 100000;
+
+M19. Employees who are the only employee in their department
+----------------------------------------------------------------------------------
+SELECT e.employee_id, e.first_name, e.department_id
+FROM hr.employees e
+WHERE (SELECT COUNT(*)
+       FROM hr.employees e2
+       WHERE e2.department_id = e.department_id) = 1;
+
+M20. Departments with at least one employee having no manager
+----------------------------------------------------------------------------------
+SELECT d.department_id, d.department_name
+FROM hr.departments d
+WHERE EXISTS
+      (SELECT 1
+       FROM hr.employees e
+       WHERE e.department_id = d.department_id
+         AND e.manager_id IS NULL);
