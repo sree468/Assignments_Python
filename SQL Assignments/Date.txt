@@ -1,0 +1,331 @@
+M1:
+select employee_id,first_name,last_name,
+concat(first_name,' ',last_name) as "full name"
+from hr.employees;
+---------------------------------------------
+select employee_id,salary,salary*0.10 as "Bonus 10 pct"
+from hr.employees;
+-----------------------------------------------------
+SELECT employee_id,
+       hire_date,
+       'Employee' AS record_type
+FROM hr.employees;
+-----------------------------------------------------------
+SELECT email,
+       '@company.com' AS email_domain
+FROM hr.employees;
+------------------------------------------------------------
+List employee_id, salary, commission_pct, and effective_commission where effective_commission is NVL(commission_pct, 0).
+
+SELECT employee_id,
+       salary,
+       commission_pct,
+       NVL(commission_pct, 0) AS effective_commission
+FROM hr.employees;
+---------------------------------------------------------------------
+Display first_name, last_name, and a column initials formed by the first character of first_name and the first character of last_name (e.g., "JD"). 
+Hint: Use SUBSTR(first_name, 1, 1) and SUBSTR(last_name, 1, 1) concatenated
+
+select substr(first_name,1,1)||substr(last_name,1,1)
+from hr.employees;
+annual,bonus
+SELECT salary,
+       salary * 12 AS "Annual salary",
+       salary * 12 * 1.1 AS "Annual bonus"
+FROM hr.employees;
+---------------------------------------------------------------------
+From hr.employees, select employee_id and a column description that is the literal 'Emp#' concatenated with employee_id (cast to string if needed: use TO_CHAR(employee_id)).
+SELECT employee_id,
+       'Emp#' || TO_CHAR(employee_id) AS description
+FROM hr.employees;
+-------------------------------------------------------------
+Display job_id, salary, and a column salary_band that is the literal 'Standard' for every row.
+
+SELECT job_id,
+       salary,
+       'Standard' AS salary_band
+FROM hr.employees;
+----------------------------------------------------------------------------
+List employee_id, first_name, last_name, and display_name as "Last, First"
+SELECT employee_id,
+       first_name,
+       last_name,
+       last_name || ', ' || first_name AS display_name
+FROM hr.employees;
+________________________________________
+M12
+Show department_id and a literal 1 as sort_order
+SELECT department_id,
+       1 AS sort_order
+FROM hr.departments;
+________________________________________
+M13
+Display salary and monthly_net (15% tax deduction)
+SELECT salary,
+       salary * 0.85 AS monthly_net
+FROM hr.employees;
+________________________________________
+M14
+List employee_id, commission_pct, commission_display (NULL → 0)
+SELECT employee_id,
+       commission_pct,
+       NVL(commission_pct, 0) AS commission_display
+FROM hr.employees;
+________________________________________
+M15
+Display compensation = salary × (1 + commission_pct)
+SELECT first_name,
+       last_name,
+       salary,
+       salary * (1 + NVL(commission_pct, 0)) AS compensation
+FROM hr.employees;
+________________________________________
+M16
+List department_name and literal region = 'HQ'
+SELECT department_name,
+       'HQ' AS region
+FROM hr.departments;
+________________________________________
+M17
+Show employee_id, hire_date, and literal years_label
+SELECT employee_id,
+       hire_date,
+       'Years of service' AS years_label
+FROM hr.employees;
+________________________________________
+M18
+List employee_id, salary, and double_salary
+SELECT employee_id,
+       salary,
+       salary * 2 AS double_salary
+FROM hr.employees;
+________________________________________
+M19
+Show manager_id and has_manager using NVL2
+SELECT employee_id,
+       manager_id,
+       NVL2(manager_id, 'Yes', 'No') AS has_manager
+FROM hr.employees;
+________________________________________
+M20
+Show department_id, department_name, and dept_code (first 3 characters)
+SELECT department_id,
+       department_name,
+       SUBSTR(department_name, 1, 3) AS dept_code
+FROM hr.departments;
+H1. Salary rank using CASE
+Question:
+Display employee_id, first_name, last_name, salary, and a column salary_rank_label such that:
+•	Salary ≥ 10000 → High
+•	Salary ≥ 5000 → Medium
+•	Otherwise → Low
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       salary,
+       CASE
+           WHEN salary >= 10000 THEN 'High'
+           WHEN salary >= 5000  THEN 'Medium'
+           ELSE 'Low'
+       END AS salary_rank_label
+FROM hr.employees;
+________________________________________
+H2. Total compensation (rounded)
+Question:
+Display employee_id, salary, commission_pct, and total compensation rounded to 2 decimals.
+Commission should be treated as 0 if NULL.
+Answer:
+SELECT employee_id,
+       salary,
+       commission_pct,
+       ROUND(salary * (1 + NVL(commission_pct, 0)), 2) AS total_comp
+FROM hr.employees;
+________________________________________
+H3. Email in upper case and length
+Question:
+Display employee_id, email, email converted to uppercase, and the length of email.
+Answer:
+SELECT employee_id,
+       email,
+       UPPER(email)  AS email_upper,
+       LENGTH(email) AS email_length
+FROM hr.employees;
+________________________________________
+H4. Department name length
+Question:
+Display department_id, department_name, and the length of the department name.
+Answer:
+SELECT department_id,
+       department_name,
+       LENGTH(department_name) AS name_length
+FROM hr.departments;
+________________________________________
+H5. Reverse name (LastFirst)
+Question:
+Display employee_id, first_name, last_name, and a column reverse_name formed as last_name concatenated with first_name.
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       last_name || first_name AS reverse_name
+FROM hr.employees;
+________________________________________
+H6. Literal data source
+Question:
+Display employee_id, hire_date, and a literal column data_source with value HR.EMPLOYEES.
+Answer:
+SELECT employee_id,
+       hire_date,
+       'HR.EMPLOYEES' AS data_source
+FROM hr.employees;
+________________________________________
+H7. Salary percentage of total payroll
+Question:
+Display employee_id, job_id, salary, and salary percentage contribution to total payroll (rounded to 2 decimals).
+Answer:
+SELECT employee_id,
+       job_id,
+       salary,
+       ROUND(
+         salary * 100 /
+         (SELECT SUM(salary) FROM hr.employees),
+         2
+       ) AS salary_percentage
+FROM hr.employees;
+________________________________________
+H8. Formal name
+Question:
+Display employee_id, first_name, last_name, and formal_name prefixed with Mr..
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       'Mr. ' || first_name || ' ' || last_name AS formal_name
+FROM hr.employees;
+________________________________________
+H9. Annual salary with 5% raise
+Question:
+Display employee_id, salary, and annual salary assuming a 5% raise.
+Answer:
+SELECT employee_id,
+       salary,
+       salary * 12 * 1.05 AS annual_with_raise
+FROM hr.employees;
+________________________________________
+H10. Department id-name code
+Question:
+Display department_id, department_name, and a combined id-name code.
+Answer:
+SELECT department_id,
+       department_name,
+       TO_CHAR(department_id) || '-' || department_name AS id_name
+FROM hr.departments;
+________________________________________
+H11. Commission category
+Question:
+Display employee_id, commission_pct, and commission_category showing:
+•	Commissioned if commission exists
+•	Non-commissioned if commission is NULL
+Answer:
+SELECT employee_id,
+       commission_pct,
+       NVL2(commission_pct,
+            'Commissioned',
+            'Non-commissioned') AS commission_category
+FROM hr.employees;
+________________________________________
+H12. Literal expression text
+Question:
+Display employee details and show the literal text salary * 12 as salary_expression.
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       salary,
+       'salary * 12' AS salary_expression
+FROM hr.employees;
+________________________________________
+H13. Job and salary label
+Question:
+Display employee_id, job_id, and a job_salary_label combining job_id and salary.
+Answer:
+SELECT employee_id,
+       job_id,
+       job_id || ':' || TO_CHAR(salary) AS job_salary_label
+FROM hr.employees;
+________________________________________
+H14. Tax bracket using CASE
+Question:
+Display employee_id, salary, and tax bracket based on salary ranges.
+Answer:
+SELECT employee_id,
+       salary,
+       CASE
+           WHEN salary >= 10000 THEN '20%'
+           WHEN salary >= 5000  THEN '15%'
+           ELSE '10%'
+       END AS tax_bracket
+FROM hr.employees;
+________________________________________
+H15. Department info text
+Question:
+Display department_id, department_name, and formatted department information text.
+Answer:
+SELECT department_id,
+       department_name,
+       'Department ' || TO_CHAR(department_id) || ' - ' || department_name
+       AS dept_info
+FROM hr.departments;
+________________________________________
+H16. Full name reversed
+Question:
+Display employee_id and full name in reverse order (Last First).
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       last_name || ' ' || first_name AS full_name_reversed
+FROM hr.employees;
+________________________________________
+H17. Effective salary with commission
+Question:
+Display effective salary including commission if available; otherwise show salary.
+Answer:
+SELECT employee_id,
+       salary,
+       commission_pct,
+       NVL2(commission_pct,
+            salary * (1 + commission_pct),
+            salary) AS effective_salary
+FROM hr.employees;
+________________________________________
+H18. Hire year
+Question:
+Display employee_id, hire_date, and the year of hiring.
+Answer:
+SELECT employee_id,
+       hire_date,
+       EXTRACT(YEAR FROM hire_date) AS hire_year
+FROM hr.employees;
+________________________________________
+H19. Word count in department name
+Question:
+Display department_name and number of words in the department name.
+Answer:
+SELECT department_name,
+       LENGTH(department_name)
+       - LENGTH(REPLACE(department_name, ' ', '')) + 1
+       AS word_count
+FROM hr.departments;
+________________________________________
+H20. Name with employee id
+Question:
+Display employee_id, first_name, last_name, and formatted name with employee_id in brackets.
+Answer:
+SELECT employee_id,
+       first_name,
+       last_name,
+       '[' || TO_CHAR(employee_id) || '] ' ||
+       first_name || ' ' || last_name AS name_with_id
+FROM hr.employees;
