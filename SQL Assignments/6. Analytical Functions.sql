@@ -1,0 +1,111 @@
+-- 1. Assign row numbers to each order.
+SELECT order_id,ROW_NUMBER() OVER (ORDER BY order_date) AS row_num
+FROM Orders;
+-- 2. Rank products by price.
+SELECT PRODUCT_NAME,rank() OVER (ORDER BY UNIT_PRICE) AS rank_num
+FROM Orders;
+-- 3. Dense rank products by sales.
+SELECT PRODUCT_NAME,(QUANTITY * UNIT_PRICE) AS SALES,DENSE_RANK() OVER (ORDER BY QUANTITY * UNIT_PRICE DESC) AS SALES_RANK
+FROM ORDERS;
+-- 4. Find running total of sales.
+SELECT ORDER_DATE,SUM(QUANTITY * UNIT_PRICE) OVER (ORDER BY ORDER_DATE) AS RUNNING_TOTAL
+FROM ORDERS;
+-- 5. Calculate cumulative sum by month.
+SELECT
+    ORDER_DATE,
+    (QUANTITY * UNIT_PRICE) AS SALES,
+    SUM(QUANTITY * UNIT_PRICE)
+        OVER (
+            PARTITION BY TO_CHAR(ORDER_DATE, 'YYYY-MM')
+            ORDER BY ORDER_DATE
+        ) AS MONTHLY_CUMULATIVE_SALES
+FROM ORDERS;
+-- 6. Find moving average of last 3 days.
+SELECT
+    ORDER_DATE,
+    (QUANTITY * UNIT_PRICE) AS SALES,
+    AVG(QUANTITY * UNIT_PRICE)
+        OVER (
+            ORDER BY ORDER_DATE
+            ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+        ) AS MOVING_AVG_3_DAYS
+FROM ORDERS;
+-- 7. Calculate lag of previous day sales.
+SELECT ORDER_DATE, (QUANTITY * UNIT_PRICE) AS SALES, LAG(QUANTITY * UNIT_PRICE)OVER (ORDER BY ORDER_DATE) AS PREVIOUS_DAY_SALES
+FROM ORDERS;
+-- 8. Calculate lead of next day sales.
+SELECT ORDER_DATE,(QUANTITY * UNIT_PRICE) AS SALES,LEAD(QUANTITY * UNIT_PRICE) OVER (ORDER BY ORDER_DATE) AS NEXT_DAY_SALES
+FROM ORDERS;
+-- 9. Find difference between current and previous sale.
+SELECT ORDER_DATE,(QUANTITY * UNIT_PRICE) AS SALES,(QUANTITY * UNIT_PRICE) - LAG(QUANTITY * UNIT_PRICE)OVER (ORDER BY ORDER_DATE) AS SALES_DIFFERENCE
+FROM ORDERS;
+-- 10. Partition sales by region.
+SELECT STORE_LOCATION,(QUANTITY * UNIT_PRICE) AS SALES,SUM(QUANTITY * UNIT_PRICE)OVER (PARTITION BY STORE_LOCATION) AS STORE_TOTAL_SALES
+FROM ORDERS;
+-- 11. Find top 3 products per category.
+
+-- 12. Find bottom 2 customers by sales.
+-- 13. Calculate percentage of total sales.
+SELECT
+    ORDER_ID,
+    (QUANTITY * UNIT_PRICE) AS SALES,
+    ROUND(
+        (QUANTITY * UNIT_PRICE)
+        / SUM(QUANTITY * UNIT_PRICE) OVER () * 100, 2
+    ) AS SALES_PERCENTAGE
+FROM ORDERS;
+-- 14. Calculate NTILE distribution of customers.
+SELECT
+    CUSTOMER_ID,
+    CUSTOMER_NAME,
+    SUM(QUANTITY * UNIT_PRICE) AS TOTAL_SALES,
+    NTILE(4) OVER (ORDER BY SUM(QUANTITY * UNIT_PRICE) DESC) AS SALES_GROUP
+FROM ORDERS
+GROUP BY CUSTOMER_ID, CUSTOMER_NAME;
+-- 15. Find first order per customer.
+SELECT *FROM (SELECT ORDER_ID,CUSTOMER_ID,CUSTOMER_NAME,ORDER_DATE,ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE) AS RN FROM ORDERS)
+WHERE RN = 1;
+-- 16. Find last order per customer.
+SELECT *
+FROM (
+    SELECT
+        ORDER_ID,
+        CUSTOMER_ID,
+        CUSTOMER_NAME,
+        ORDER_DATE,
+        ROW_NUMBER() OVER (
+            PARTITION BY CUSTOMER_ID
+            ORDER BY ORDER_DATE DESC
+        ) AS RN
+    FROM ORDERS
+)
+WHERE RN = 1;
+-- 17. Calculate average salary within department.
+SELECT
+    PRODUCT_CATEGORY,
+    (QUANTITY * UNIT_PRICE) AS SALES,
+    AVG(QUANTITY * UNIT_PRICE)
+        OVER (PARTITION BY PRODUCT_CATEGORY) AS AVG_CATEGORY_SALES
+FROM ORDERS;
+-- 18. Compare current row with max value in partition.
+-- 19. Identify duplicate records using ROW_NUMBER.
+SELECT *
+FROM (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY ORDER_ID
+            ORDER BY ORDER_DATE
+        ) AS RN
+    FROM ORDERS
+)
+WHERE RN > 1;
+-- 20. Find cumulative distinct count.
+SELECT
+    ORDER_DATE,
+    COUNT(DISTINCT CUSTOMER_ID)
+        OVER (ORDER BY ORDER_DATE) AS CUMULATIVE_CUSTOMERS
+FROM ORDERS;
+
+
+select * from Orders;
