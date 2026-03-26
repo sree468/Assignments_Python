@@ -25,7 +25,7 @@ st.sidebar.header("🔧 Filters (Interactive)")
 
 regions = st.sidebar.multiselect("Select Region", options=data['Region'].unique(), default=data['Region'].unique())
 categories = st.sidebar.multiselect("Select Category", options=data['Category'].unique(), default=data['Category'].unique())
-products = st.sidebar.multiselect("Select Product", options=data['Product'].unique(), default=data['Product'].unique())
+products = st.sidebar.multiselect("Select Product", options=data['Product'].unique(), default=data['Product'].unique()[0:6])
 
 filtered_data = data[
     (data['Region'].isin(regions)) &
